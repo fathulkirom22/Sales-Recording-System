@@ -32,7 +32,6 @@
                 <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded">{{ __('Create') }}</button>
             </div>
         </form>
-        <p class="text-sm text-gray-500">{{ __('Form stub — implement next.') }}</p>
         <div class="mt-4">
             <a href="{{ route('users.index') }}" class="text-sm text-indigo-600 hover:underline">{{ __('Back to list') }}</a>
         </div>

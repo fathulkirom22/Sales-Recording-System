@@ -24,7 +24,7 @@
 
     <x-page-stub
         :title="__('Sales List')"
-        :description="__('Datatables list — latest sales first. Wire up server-side data next.')"
+        :description="__('List of all sales.')"
         :create-route="route('sales.create')"
         :create-label="__('Add Sale')"
     >
@@ -40,11 +40,25 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 bg-white">
-                    <tr>
-                        <td colspan="5" class="px-4 py-8 text-center text-gray-400">
-                            {{ __('No data yet. Implement Datatables binding.') }}
-                        </td>
-                    </tr>
+                    @if($sales->isEmpty())
+                        <tr>
+                            <td colspan="5" class="px-4 py-8 text-center text-gray-400">
+                                {{ __('No data yet. Implement Datatables binding.') }}
+                            </td>
+                        </tr>
+                    @else
+                        @foreach($sales as $sale)
+                            <tr>
+                                <td class="px-4 py-4 text-gray-700">{{ $sale->code }}</td>
+                                <td class="px-4 py-4 text-gray-700">{{ date('d-m-Y', strtotime($sale->sale_date)) }}</td>
+                                <td class="px-4 py-4 text-gray-700">Rp. {{ number_format((float) $sale->total_amount, 0, ',', '.') }}</td>
+                                <td class="px-4 py-4 text-gray-700">{{ $sale->status->label() }}</td>
+                                <td class="px-4 py-4 text-right">
+                                    <a href="{{ route('sales.show', $sale) }}" class="text-blue-500 hover:text-blue-700">{{ __('View') }}</a>
+                                </td>
+                            </tr>
+                        @endforeach
+                    @endif
                 </tbody>
             </table>
         </div>

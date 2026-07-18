@@ -15,8 +15,13 @@
             </div>
         </dl>
 
-        <div class="mt-6 flex gap-4">
+        <div class="mt-6 flex gap-4 align-middle items-center">
             <a href="{{ route('users.edit', $user) }}" class="text-sm text-indigo-600 hover:underline">{{ __('Edit') }}</a>
+            <form action="{{ route('users.destroy', $user) }}" method="POST" onsubmit="return confirm('{{ __('Are you sure you want to delete this user?') }}')">
+              @csrf
+              @method('DELETE')
+              <button type="submit" class="text-sm text-red-600 hover:underline">Delete</button>
+            </form>
             <a href="{{ route('users.index') }}" class="text-sm text-gray-600 hover:underline">{{ __('Back to list') }}</a>
         </div>
     </x-page-stub>

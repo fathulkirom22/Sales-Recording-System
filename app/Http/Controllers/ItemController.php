@@ -10,8 +10,8 @@ class ItemController extends Controller
 {
     public function index(): View
     {
-        // TODO: Datatables list
-        return view('items.index');
+        $items = Item::all();
+        return view('items.index', compact('items'));
     }
 
     public function create(): View
@@ -21,8 +21,23 @@ class ItemController extends Controller
 
     public function store(Request $request)
     {
-        // TODO: store code, name, image, price
-        abort(501);
+        // store code, name, image, price
+        $validated = $request->validate([
+            'code' => 'required|unique:items',
+            'name' => 'required',
+            'image' => 'required|image',
+            'price' => 'required|numeric',
+        ]);
+
+        // store image in storage/app/public/images
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')->store('images', 'public');
+        }
+
+        $item = new Item();
+        $item->fill($validated);
+        $item->save();
+        return redirect()->route('items.show', $item)->with('success', 'Item created successfully.');
     }
 
     public function show(Item $item): View
@@ -37,13 +52,27 @@ class ItemController extends Controller
 
     public function update(Request $request, Item $item)
     {
-        // TODO: update item + optional image replace
-        abort(501);
+        // update item + optional image replace
+        $validated = $request->validate([
+            'code' => 'required|unique:items,code,' . $item->id,
+            'name' => 'required',
+            'image' => 'image',
+            'price' => 'required|numeric',
+        ]);
+
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')->store('images', 'public');
+        }
+
+        $item->fill(array_filter($validated, fn($value) => $value !== null));
+        $item->save();
+        return redirect()->route('items.show', $item)->with('success', 'Item updated successfully.');
     }
 
     public function destroy(Item $item)
     {
-        // TODO: delete item
-        abort(501);
+        // delete item
+        $item->delete();
+        return redirect()->route('items.index')->with('success', 'Item deleted successfully.');
     }
 }

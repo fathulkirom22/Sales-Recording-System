@@ -35,7 +35,7 @@
             <main>
                 <!-- Success Alert -->
                 @if (session('success'))
-                    <div class="max-w-7xl mt-4 mx-auto sm:px-6 lg:px-8">
+                    <div class="max-w-7xl mt-6 mx-auto sm:px-6 lg:px-8">
                         <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
                             <ul>
                                 <li>{{ session('success') }}</li>
@@ -46,9 +46,9 @@
 
                 <!-- Error Alert -->
                 @if ($errors->any())
-                    <div class="max-w-7xl mt-4 mx-auto sm:px-6 lg:px-8">
-                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert"">
-                            <ul>
+                    <div class="max-w-7xl mt-6 mx-auto sm:px-6 lg:px-8">
+                        <div class="mt-4 rounded-md bg-red-50 p-4 text-sm text-red-700">
+                            <ul class="list-disc list-inside">
                                 @foreach ($errors->all() as $error)
                                     <li>{{ $error }}</li>
                                 @endforeach

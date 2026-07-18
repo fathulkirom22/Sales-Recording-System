@@ -24,7 +24,7 @@
 
     <x-page-stub
         :title="__('Payment List')"
-        :description="__('Datatables list — latest payments first. Support partial payments next.')"
+        :description="__('List of all payments.')"
         :create-route="route('payments.create')"
         :create-label="__('Add Payment')"
     >
@@ -40,11 +40,25 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 bg-white">
-                    <tr>
-                        <td colspan="5" class="px-4 py-8 text-center text-gray-400">
-                            {{ __('No data yet. Implement Datatables binding.') }}
-                        </td>
-                    </tr>
+                    @if($payments->isEmpty())
+                        <tr>
+                            <td colspan="5" class="px-4 py-8 text-center text-gray-400">
+                                {{ __('No data yet.') }}
+                            </td>
+                        </tr>
+                    @else
+                        @foreach($payments as $payment)
+                            <tr>
+                                <td class="px-4 py-4 text-gray-700">{{ $payment->code }}</td>
+                                <td class="px-4 py-4 text-gray-700">{{ $payment->sale->code }}</td>
+                                <td class="px-4 py-4 text-gray-700">{{ $payment->amount }}</td>
+                                <td class="px-4 py-4 text-gray-700">{{ $payment->created_at->format('Y-m-d H:i') }}</td>
+                                <td class="px-4 py-4 text-right">
+                                    <a href="{{ route('payments.show', $payment) }}" class="text-blue-600 hover:text-blue-800">{{ __('View') }}</a>
+                                </td>
+                            </tr>
+                        @endforeach
+                    @endif
                 </tbody>
             </table>
         </div>

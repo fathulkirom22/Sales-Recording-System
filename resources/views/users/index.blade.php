@@ -5,7 +5,7 @@
 
     <x-page-stub
         :title="__('User List')"
-        :description="__('Master data for users. Role & permission via Spatie.')"
+        :description="__('Master data for users.')"
         :create-route="route('users.create')"
         :create-label="__('Add User')"
     >
@@ -36,7 +36,6 @@
                                 <td class="px-4 py-4 text-left">{{ $user->roles->pluck('name')->implode(', ') }}</td>
                                 <td class="px-4 py-4 text-right">
                                     <a href="{{ route('users.show', $user) }}" class="text-blue-500 hover:underline">{{ __('View') }}</a>
-                                    <a href="{{ route('users.edit', $user) }}" class="text-blue-500 hover:underline">{{ __('Edit') }}</a>
                                 </td>
                             </tr>
                         @endforeach

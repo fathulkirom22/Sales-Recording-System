@@ -5,7 +5,7 @@
 
     <x-page-stub
         :title="__('Item List')"
-        :description="__('Master data for items. Datatables list next.')"
+        :description="__('Master data for items.')"
         :create-route="route('items.create')"
         :create-label="__('Add Item')"
     >
@@ -21,11 +21,27 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 bg-white">
-                    <tr>
-                        <td colspan="5" class="px-4 py-8 text-center text-gray-400">
-                            {{ __('No data yet. Implement Datatables binding.') }}
-                        </td>
-                    </tr>
+                    @if($items->isEmpty())
+                        <tr>
+                            <td colspan="5" class="px-4 py-8 text-center text-gray-400">
+                                {{ __('No data yet.') }}
+                            </td>
+                        </tr>
+                    @else
+                        @foreach($items as $item)
+                            <tr>
+                                <td class="px-4 py-4 text-left">{{ $item->code }}</td>
+                                <td class="px-4 py-4 text-left">{{ $item->name }}</td>
+                                <td class="px-4 py-4 text-left">Rp {{ number_format((float) $item->price, 0, ',', '.') }}</td>
+                                <td class="px-4 py-4 text-left">
+                                    <img src="{{ asset('storage/' . $item->image) }}" alt="{{ $item->name }}" class="w-10 h-10 object-cover">
+                                </td>
+                                <td class="px-4 py-4 text-right">
+                                    <a href="{{ route('items.show', $item) }}" class="text-blue-500 hover:underline">{{ __('View') }}</a>
+                                </td>
+                            </tr>
+                        @endforeach
+                    @endif
                 </tbody>
             </table>
         </div>

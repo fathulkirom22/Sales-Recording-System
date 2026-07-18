@@ -41,8 +41,6 @@ This project provides a dashboard with analytics, sales management, payment trac
 - **Role & Permission**: Spatie Laravel Permission
 - **Development & Deployment**: Docker Compose
 
-> Do **not** use Laravel admin UI frameworks (Filament, Orchid, Backpack, etc.).
-
 ---
 
 ## Project Structure (boilerplate)
@@ -166,7 +164,3 @@ Middleware aliases registered: `role`, `permission`, `role_or_permission`.
 - Item images stored on the `public` disk
 
 ---
-
-## License
-
-MIT
