@@ -1,0 +1,78 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: sales-recording-app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    environment:
+      APP_ENV: ${APP_ENV:-local}
+      APP_DEBUG: ${APP_DEBUG:-true}
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: ${DB_DATABASE:-sales_recording}
+      DB_USERNAME: ${DB_USERNAME:-sales}
+      DB_PASSWORD: ${DB_PASSWORD:-secret}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: php artisan serve --host=0.0.0.0 --port=8000
+    networks:
+      - sales-recording
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: sales-recording-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-sales_recording}
+      POSTGRES_USER: ${DB_USERNAME:-sales}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-sales} -d ${DB_DATABASE:-sales_recording}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - sales-recording
+
+  node:
+    image: node:22-alpine
+    container_name: sales-recording-node
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    ports:
+      - "${VITE_PORT:-5173}:5173"
+    environment:
+      # App name for import.meta.env.VITE_APP_NAME (not the listen address)
+      VITE_APP_NAME: ${VITE_APP_NAME:-Sales Recording}
+      VITE_PORT: ${VITE_PORT:-5173}
+      # Host the *browser* uses (never 0.0.0.0 — that is only the container bind)
+      VITE_HMR_HOST: ${VITE_HMR_HOST:-localhost}
+      VITE_DEV_SERVER_URL: ${VITE_DEV_SERVER_URL:-http://localhost:5173}
+      VITE_USE_POLLING: ${VITE_USE_POLLING:-true}
+    # Bind 0.0.0.0 so the port is reachable from the host; HMR still uses localhost
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port $${VITE_PORT:-5173}"
+    networks:
+      - sales-recording
+    profiles:
+      - frontend
+
+
+volumes:
+  postgres_data:
+
+networks:
+  sales-recording:
+    driver: bridge
