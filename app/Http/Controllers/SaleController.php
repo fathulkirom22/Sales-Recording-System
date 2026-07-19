@@ -11,6 +11,7 @@ use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\View\View;
 use Yajra\DataTables\Facades\DataTables;
+use App\Support\CodeGenerator;
 
 class SaleController extends Controller implements HasMiddleware
 {
@@ -68,7 +69,7 @@ class SaleController extends Controller implements HasMiddleware
         ]);
         $sale = new Sale();
         $sale->fill([
-            'code' => strtoupper(uniqid()),
+            'code' => CodeGenerator::next(Sale::class, 'SALE'),
             'user_id' => auth()->id(),
             'sale_date' => now(),
             'status' => SaleStatus::Unpaid,

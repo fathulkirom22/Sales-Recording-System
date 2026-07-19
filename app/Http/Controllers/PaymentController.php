@@ -11,6 +11,8 @@ use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\View\View;
 use Yajra\DataTables\Facades\DataTables;
+use App\Support\CodeGenerator;
+
 
 class PaymentController extends Controller implements HasMiddleware
 {
@@ -83,7 +85,7 @@ class PaymentController extends Controller implements HasMiddleware
         }
 
         Payment::create([
-            'code' => 'PAY-' . strtoupper(uniqid()),
+            'code' => CodeGenerator::next(Payment::class, 'PAY'),
             'sale_id' => $sale->id,
             'user_id' => auth()->id(),
             'amount' => $validated['amount'],
