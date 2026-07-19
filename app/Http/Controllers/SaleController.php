@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Enums\SaleStatus;
 use App\Models\Sale;
 use App\Models\Item;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\View\View;
+use Yajra\DataTables\Facades\DataTables;
 
 class SaleController extends Controller implements HasMiddleware
 {
@@ -21,22 +23,33 @@ class SaleController extends Controller implements HasMiddleware
             new Middleware('permission:sales.delete', only: ['destroy']),
         ];
     }
-    public function index(Request $request): View
+    public function index(Request $request): View|JsonResponse
     {
-        // Datatables + date filter
-        $sales = Sale::query()
-            ->when($request->input('date_from'), function ($query, $dateFrom) {
-                $query->whereDate('sale_date', '>=', $dateFrom);
-            })
-            ->when($request->input('date_to'), function ($query, $dateTo) {
-                $query->whereDate('sale_date', '<=', $dateTo);
-            })
-            ->latest()
-            ->get();
+        $dateFrom = $request->input('date_from');
+        $dateTo = $request->input('date_to');
+
+        if ($request->ajax()) {
+            $query = Sale::query()
+                ->when($dateFrom, function ($query, $dateFrom) {
+                    $query->whereDate('sale_date', '>=', $dateFrom);
+                })
+                ->when($dateTo, function ($query, $dateTo) {
+                    $query->whereDate('sale_date', '<=', $dateTo);
+                })
+                ->latest();
+
+            return DataTables::eloquent($query)
+                ->editColumn('sale_date', fn (Sale $sale) => $sale->sale_date?->format('d-m-Y'))
+                ->editColumn('total_amount', fn (Sale $sale) => 'Rp. ' . number_format((float) $sale->total_amount, 0, ',', '.'))
+                ->editColumn('status', fn (Sale $sale) => $sale->status->label())
+                ->addColumn('actions', fn (Sale $sale) => '<a href="' . route('sales.show', $sale) . '" class="text-blue-500 hover:text-blue-700">' . __('View') . '</a>')
+                ->rawColumns(['actions'])
+                ->toJson();
+        }
+
         return view('sales.index', [
-            'dateFrom' => $request->input('date_from'),
-            'dateTo' => $request->input('date_to'),
-            'sales' => $sales,
+            'dateFrom' => $dateFrom,
+            'dateTo' => $dateTo,
         ]);
     }
 

@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\View\View;
+use Yajra\DataTables\Facades\DataTables;
 
 class UserController extends Controller implements HasMiddleware
 {
@@ -19,11 +21,17 @@ class UserController extends Controller implements HasMiddleware
             new Middleware('permission:users.delete', only: ['destroy']),
         ];
     }
-    public function index(): View
+    public function index(Request $request): View|JsonResponse
     {
-        // Datatables list + roles
-        $users = User::all();
-        return view('users.index', compact('users'));
+        if ($request->ajax()) {
+            return DataTables::eloquent(User::query()->with('roles'))
+                ->addColumn('roles', fn (User $user) => $user->roles->pluck('name')->implode(', '))
+                ->addColumn('actions', fn (User $user) => '<a href="' . route('users.show', $user) . '" class="text-blue-500 hover:underline">' . __('View') . '</a>')
+                ->rawColumns(['actions'])
+                ->toJson();
+        }
+
+        return view('users.index');
     }
 
     public function create(): View

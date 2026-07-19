@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Enums\SaleStatus;
 use App\Models\Payment;
 use App\Models\Sale;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\View\View;
+use Yajra\DataTables\Facades\DataTables;
 
 class PaymentController extends Controller implements HasMiddleware
 {
@@ -21,22 +23,34 @@ class PaymentController extends Controller implements HasMiddleware
             new Middleware('permission:payments.delete', only: ['destroy']),
         ];
     }
-    public function index(Request $request): View
+    public function index(Request $request): View|JsonResponse
     {
-        // TODO: Datatables + date filter
-        $payments = Payment::query()
-            ->when($request->input('date_from'), function ($query, $dateFrom) {
-                $query->where('created_at', '>=', $dateFrom);
-            })
-            ->when($request->input('date_to'), function ($query, $dateTo) {
-                $query->where('created_at', '<=', $dateTo);
-            })
-            ->latest()
-            ->get();
+        $dateFrom = $request->input('date_from');
+        $dateTo = $request->input('date_to');
+
+        if ($request->ajax()) {
+            $query = Payment::query()
+                ->with('sale')
+                ->when($dateFrom, function ($query, $dateFrom) {
+                    $query->where('created_at', '>=', $dateFrom);
+                })
+                ->when($dateTo, function ($query, $dateTo) {
+                    $query->where('created_at', '<=', $dateTo);
+                })
+                ->latest();
+
+            return DataTables::eloquent($query)
+                ->addColumn('sale_code', fn (Payment $payment) => $payment->sale?->code)
+                ->editColumn('amount', fn (Payment $payment) => 'Rp ' . number_format((float) $payment->amount, 0, ',', '.'))
+                ->editColumn('created_at', fn (Payment $payment) => $payment->created_at->format('Y-m-d H:i'))
+                ->addColumn('actions', fn (Payment $payment) => '<a href="' . route('payments.show', $payment) . '" class="text-blue-500 hover:text-blue-700">' . __('View') . '</a>')
+                ->rawColumns(['actions'])
+                ->toJson();
+        }
+
         return view('payments.index', [
-            'dateFrom' => $request->input('date_from'),
-            'dateTo' => $request->input('date_to'),
-            'payments' => $payments,
+            'dateFrom' => $dateFrom,
+            'dateTo' => $dateTo,
         ]);
     }
 

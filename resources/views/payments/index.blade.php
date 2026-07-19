@@ -28,7 +28,7 @@
         :create-route="Auth::user()->can('payments.create') ? route('payments.create') : null"
         :create-label="__('Add Payment')"
     >
-        <div class="overflow-x-auto border border-gray-200 rounded-lg">
+        <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 text-sm" id="payments-table">
                 <thead class="bg-gray-50">
                     <tr>
@@ -39,28 +39,30 @@
                         <th class="px-4 py-3 text-right font-medium text-gray-500">{{ __('Actions') }}</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100 bg-white">
-                    @if($payments->isEmpty())
-                        <tr>
-                            <td colspan="5" class="px-4 py-8 text-center text-gray-400">
-                                {{ __('No data yet.') }}
-                            </td>
-                        </tr>
-                    @else
-                        @foreach($payments as $payment)
-                            <tr>
-                                <td class="px-4 py-4 text-gray-700">{{ $payment->code }}</td>
-                                <td class="px-4 py-4 text-gray-700">{{ $payment->sale->code }}</td>
-                                <td class="px-4 py-4 text-gray-700">{{ $payment->amount }}</td>
-                                <td class="px-4 py-4 text-gray-700">{{ $payment->created_at->format('Y-m-d H:i') }}</td>
-                                <td class="px-4 py-4 text-right">
-                                    <a href="{{ route('payments.show', $payment) }}" class="text-blue-600 hover:text-blue-800">{{ __('View') }}</a>
-                                </td>
-                            </tr>
-                        @endforeach
-                    @endif
-                </tbody>
+                <tbody class="divide-y divide-gray-100 bg-white"></tbody>
             </table>
         </div>
     </x-page-stub>
+
+    @push('scripts')
+        <script>
+            $(function () {
+                $('#payments-table').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: '{{ route('payments.index', array_filter(['date_from' => $dateFrom, 'date_to' => $dateTo])) }}',
+                    columns: [
+                        { data: 'code', name: 'code' },
+                        { data: 'sale_code', name: 'sale_code', orderable: false, searchable: false },
+                        { data: 'amount', name: 'amount' },
+                        { data: 'created_at', name: 'created_at' },
+                        { data: 'actions', name: 'actions', orderable: false, searchable: false },
+                    ],
+                    columnDefs: [
+                        { targets: [2, 4], className: 'dt-body-right' } // kolom 0 & 1 rata kanan
+                    ]
+                });
+            });
+        </script>
+    @endpush
 </x-app-layout>

@@ -28,7 +28,7 @@
         :create-route="Auth::user()->can('sales.create') ? route('sales.create') : null"
         :create-label="__('Add Sale')"
     >
-        <div class="overflow-x-auto border border-gray-200 rounded-lg">
+        <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 text-sm" id="sales-table">
                 <thead class="bg-gray-50">
                     <tr>
@@ -39,28 +39,30 @@
                         <th class="px-4 py-3 text-right font-medium text-gray-500">{{ __('Actions') }}</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100 bg-white">
-                    @if($sales->isEmpty())
-                        <tr>
-                            <td colspan="5" class="px-4 py-8 text-center text-gray-400">
-                                {{ __('No data yet. Implement Datatables binding.') }}
-                            </td>
-                        </tr>
-                    @else
-                        @foreach($sales as $sale)
-                            <tr>
-                                <td class="px-4 py-4 text-gray-700">{{ $sale->code }}</td>
-                                <td class="px-4 py-4 text-gray-700">{{ date('d-m-Y', strtotime($sale->sale_date)) }}</td>
-                                <td class="px-4 py-4 text-gray-700">Rp. {{ number_format((float) $sale->total_amount, 0, ',', '.') }}</td>
-                                <td class="px-4 py-4 text-gray-700">{{ $sale->status->label() }}</td>
-                                <td class="px-4 py-4 text-right">
-                                    <a href="{{ route('sales.show', $sale) }}" class="text-blue-500 hover:text-blue-700">{{ __('View') }}</a>
-                                </td>
-                            </tr>
-                        @endforeach
-                    @endif
-                </tbody>
+                <tbody class="divide-y divide-gray-100 bg-white"></tbody>
             </table>
         </div>
     </x-page-stub>
+
+    @push('scripts')
+        <script>
+            $(function () {
+                $('#sales-table').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: '{{ route('sales.index', array_filter(['date_from' => $dateFrom, 'date_to' => $dateTo])) }}',
+                    columns: [
+                        { data: 'code', name: 'code' },
+                        { data: 'sale_date', name: 'sale_date' },
+                        { data: 'total_amount', name: 'total_amount' },
+                        { data: 'status', name: 'status' },
+                        { data: 'actions', name: 'actions', orderable: false, searchable: false, align: 'right' },
+                    ],
+                    columnDefs: [
+                        { targets: [2, 4], className: 'dt-body-right' } // kolom 0 & 1 rata kanan
+                    ]
+                });
+            });
+        </script>
+    @endpush
 </x-app-layout>

@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Item;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\View\View;
+use Yajra\DataTables\Facades\DataTables;
 
 class ItemController extends Controller implements HasMiddleware
 {
@@ -19,10 +21,18 @@ class ItemController extends Controller implements HasMiddleware
             new Middleware('permission:items.delete', only: ['destroy']),
         ];
     }
-    public function index(): View
+    public function index(Request $request): View|JsonResponse
     {
-        $items = Item::all();
-        return view('items.index', compact('items'));
+        if ($request->ajax()) {
+            return DataTables::eloquent(Item::query())
+                ->editColumn('price', fn (Item $item) => 'Rp ' . number_format((float) $item->price, 0, ',', '.'))
+                ->addColumn('image', fn (Item $item) => $item->image ? '<img src="' . asset('storage/' . $item->image) . '" alt="' . e($item->name) . '" class="w-10 h-10 object-cover">' : '')
+                ->addColumn('actions', fn (Item $item) => '<a href="' . route('items.show', $item) . '" class="text-blue-500 hover:underline">' . __('View') . '</a>')
+                ->rawColumns(['image', 'actions'])
+                ->toJson();
+        }
+
+        return view('items.index');
     }
 
     public function create(): View
