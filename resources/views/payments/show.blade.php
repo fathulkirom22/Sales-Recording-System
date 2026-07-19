@@ -30,13 +30,17 @@
         </dl>
 
         <div class="mt-6 flex gap-4 items-center">
-            <a href="{{ route('payments.edit', $payment) }}" class="text-sm text-indigo-600 hover:underline">{{ __('Edit') }}</a>
-            <!-- Delete button -->
-            <form action="{{ route('payments.destroy', $payment) }}" method="POST" class="inline" onsubmit="return confirm('{{ __('Are you sure you want to delete this payment?') }}')">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="text-sm text-red-600 hover:underline">{{ __('Delete') }}</button>
-            </form>
+            @can('payments.update')
+                <a href="{{ route('payments.edit', $payment) }}" class="text-sm text-indigo-600 hover:underline">{{ __('Edit') }}</a>
+            @endcan
+            @can('payments.delete')
+                <!-- Delete button -->
+                <form action="{{ route('payments.destroy', $payment) }}" method="POST" class="inline" onsubmit="return confirm('{{ __('Are you sure you want to delete this payment?') }}')">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="text-sm text-red-600 hover:underline">{{ __('Delete') }}</button>
+                </form>
+            @endcan
             <a href="{{ route('payments.index') }}" class="text-sm text-gray-600 hover:underline">{{ __('Back to list') }}</a>
         </div>
     </x-page-stub>

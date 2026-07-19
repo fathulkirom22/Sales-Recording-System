@@ -12,21 +12,31 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('sales.index')" :active="request()->routeIs('sales.*')">
-                        {{ __('Sales') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('payments.index')" :active="request()->routeIs('payments.*')">
-                        {{ __('Payments') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('items.index')" :active="request()->routeIs('items.*')">
-                        {{ __('Items') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')">
-                        {{ __('Users') }}
-                    </x-nav-link>
+                    @can('dashboard.view')
+                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                            {{ __('Dashboard') }}
+                        </x-nav-link>
+                    @endcan
+                    @can('sales.view')
+                        <x-nav-link :href="route('sales.index')" :active="request()->routeIs('sales.*')">
+                            {{ __('Sales') }}
+                        </x-nav-link>
+                    @endcan
+                    @can('payments.view')
+                        <x-nav-link :href="route('payments.index')" :active="request()->routeIs('payments.*')">
+                            {{ __('Payments') }}
+                        </x-nav-link>
+                    @endcan
+                    @can('items.view')
+                        <x-nav-link :href="route('items.index')" :active="request()->routeIs('items.*')">
+                            {{ __('Items') }}
+                        </x-nav-link>
+                    @endcan
+                    @can('users.view')
+                        <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')">
+                            {{ __('Users') }}
+                        </x-nav-link>
+                    @endcan
                 </div>
             </div>
 
@@ -79,21 +89,31 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('sales.index')" :active="request()->routeIs('sales.*')">
-                {{ __('Sales') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('payments.index')" :active="request()->routeIs('payments.*')">
-                {{ __('Payments') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('items.index')" :active="request()->routeIs('items.*')">
-                {{ __('Items') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')">
-                {{ __('Users') }}
-            </x-responsive-nav-link>
+            @can('dashboard.view')
+                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                    {{ __('Dashboard') }}
+                </x-responsive-nav-link>
+            @endcan
+            @can('sales.view')
+                <x-responsive-nav-link :href="route('sales.index')" :active="request()->routeIs('sales.*')">
+                    {{ __('Sales') }}
+                </x-responsive-nav-link>
+            @endcan
+            @can('payments.view')
+                <x-responsive-nav-link :href="route('payments.index')" :active="request()->routeIs('payments.*')">
+                    {{ __('Payments') }}
+                </x-responsive-nav-link>
+            @endcan
+            @can('items.view')
+                <x-responsive-nav-link :href="route('items.index')" :active="request()->routeIs('items.*')">
+                    {{ __('Items') }}
+                </x-responsive-nav-link>
+            @endcan
+            @can('users.view')
+                <x-responsive-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')">
+                    {{ __('Users') }}
+                </x-responsive-nav-link>
+            @endcan
         </div>
 
         <!-- Responsive Settings Options -->

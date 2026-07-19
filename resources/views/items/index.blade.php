@@ -6,7 +6,7 @@
     <x-page-stub
         :title="__('Item List')"
         :description="__('Master data for items.')"
-        :create-route="route('items.create')"
+        :create-route="Auth::user()->can('items.create') ? route('items.create') : null"
         :create-label="__('Add Item')"
     >
         <div class="overflow-x-auto border border-gray-200 rounded-lg">

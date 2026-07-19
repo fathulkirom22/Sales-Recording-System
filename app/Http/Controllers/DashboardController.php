@@ -4,10 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\Sale;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\View\View;
 
-class DashboardController extends Controller
+class DashboardController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:dashboard.view'),
+        ];
+    }
     public function __invoke(Request $request): View
     {
         $dateFrom = $request->input('date_from', now()->startOfMonth()->toDateString());

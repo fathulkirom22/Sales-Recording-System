@@ -81,12 +81,16 @@
 
         <div class="mt-6 flex gap-4 items-center">
             @if ($sale->isEditable())
-                <a href="{{ route('sales.edit', $sale) }}" class="text-sm text-indigo-600 hover:underline">{{ __('Edit') }}</a>
-                <form method="POST" action="{{ route('sales.destroy', $sale) }}" onsubmit="return confirm('{{ __('Are you sure you want to delete this sale?') }}');">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="text-sm text-red-600 hover:underline">{{ __('Delete') }}</button>
-                </form>
+                @can('sales.update')
+                    <a href="{{ route('sales.edit', $sale) }}" class="text-sm text-indigo-600 hover:underline">{{ __('Edit') }}</a>
+                @endcan
+                @can('sales.delete')
+                    <form method="POST" action="{{ route('sales.destroy', $sale) }}" onsubmit="return confirm('{{ __('Are you sure you want to delete this sale?') }}');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="text-sm text-red-600 hover:underline">{{ __('Delete') }}</button>
+                    </form>
+                @endcan
             @endif
             <a href="{{ route('sales.index') }}" class="text-sm text-gray-600 hover:underline">{{ __('Back to list') }}</a>
         </div>

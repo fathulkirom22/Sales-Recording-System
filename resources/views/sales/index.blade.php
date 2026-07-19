@@ -25,7 +25,7 @@
     <x-page-stub
         :title="__('Sales List')"
         :description="__('List of all sales.')"
-        :create-route="route('sales.create')"
+        :create-route="Auth::user()->can('sales.create') ? route('sales.create') : null"
         :create-label="__('Add Sale')"
     >
         <div class="overflow-x-auto border border-gray-200 rounded-lg">

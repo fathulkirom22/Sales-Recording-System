@@ -25,7 +25,7 @@
     <x-page-stub
         :title="__('Payment List')"
         :description="__('List of all payments.')"
-        :create-route="route('payments.create')"
+        :create-route="Auth::user()->can('payments.create') ? route('payments.create') : null"
         :create-label="__('Add Payment')"
     >
         <div class="overflow-x-auto border border-gray-200 rounded-lg">

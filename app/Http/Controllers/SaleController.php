@@ -6,10 +6,21 @@ use App\Enums\SaleStatus;
 use App\Models\Sale;
 use App\Models\Item;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\View\View;
 
-class SaleController extends Controller
+class SaleController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:sales.view', only: ['index', 'show']),
+            new Middleware('permission:sales.create', only: ['create', 'store']),
+            new Middleware('permission:sales.update', only: ['edit', 'update']),
+            new Middleware('permission:sales.delete', only: ['destroy']),
+        ];
+    }
     public function index(Request $request): View
     {
         // Datatables + date filter

@@ -4,10 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\View\View;
 
-class ItemController extends Controller
+class ItemController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:items.view', only: ['index', 'show']),
+            new Middleware('permission:items.create', only: ['create', 'store']),
+            new Middleware('permission:items.update', only: ['edit', 'update']),
+            new Middleware('permission:items.delete', only: ['destroy']),
+        ];
+    }
     public function index(): View
     {
         $items = Item::all();

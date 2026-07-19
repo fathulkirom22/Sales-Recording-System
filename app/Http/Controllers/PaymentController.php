@@ -6,10 +6,21 @@ use App\Enums\SaleStatus;
 use App\Models\Payment;
 use App\Models\Sale;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\View\View;
 
-class PaymentController extends Controller
+class PaymentController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:payments.view', only: ['index', 'show']),
+            new Middleware('permission:payments.create', only: ['create', 'store']),
+            new Middleware('permission:payments.update', only: ['edit', 'update']),
+            new Middleware('permission:payments.delete', only: ['destroy']),
+        ];
+    }
     public function index(Request $request): View
     {
         // TODO: Datatables + date filter
